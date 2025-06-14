@@ -31,11 +31,22 @@ const FeePreview: React.FC<FeePreviewProps> = ({ feePreview, deliveryForm }) => 
           </div>
         )}
         
-        {/* Discount */}
-        {feePreview.discountAmount > 0 && (
-          <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">Discount ({deliveryForm.manualDiscountPercent || 0}%)</span>
-            <span className="font-medium text-red-600">- ₹{feePreview.discountAmount.toFixed(2)}</span>
+        {/* Discounts */}
+        {(feePreview.discountAmount > 0 || feePreview.autoDiscountAmount > 0) && (
+          <div className="py-2 border-b">
+            <span className="text-gray-600 font-medium">Discounts</span>
+            {feePreview.discountAmount > 0 && (
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-gray-500 pl-2">› Manual ({deliveryForm.manualDiscountPercent || 0}%)</span>
+                <span className="font-medium text-red-600">- ₹{feePreview.discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            {feePreview.autoDiscountAmount > 0 && (
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-gray-500 pl-2">› {feePreview.autoDiscountType}</span>
+                <span className="font-medium text-green-600">- ₹{feePreview.autoDiscountAmount.toFixed(2)}</span>
+              </div>
+            )}
           </div>
         )}
 

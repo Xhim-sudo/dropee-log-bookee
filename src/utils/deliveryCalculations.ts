@@ -12,6 +12,10 @@ export const FUEL_COST_PER_DELIVERY = 3;
 export const STAFF_SALARY_PER_DELIVERY = 4;
 export const MAINTENANCE_COST_PER_DELIVERY = 5;
 
+// Automatic Discount Configuration
+export const FIRST_3_ORDERS_DISCOUNT = 10; // Fixed 10₹ discount
+export const AFTER_7_ORDERS_DISCOUNT_PERCENT = 5; // 5% discount
+
 export interface FeeCalculation {
   distanceFee: number;
   weatherSurcharge: number;
@@ -21,13 +25,18 @@ export interface FeeCalculation {
   totalSurcharges: number;
   subtotal: number;
   discountAmount: number;
+  autoDiscountAmount: number;
+  autoDiscountType: string;
   finalFee: number;
   totalCosts: number;
   profit: number;
   distanceKm: string;
 }
 
-export const calculateDeliveryFee = (params: Partial<DeliveryForm>): FeeCalculation => {
+export const calculateDeliveryFee = (
+  params: Partial<DeliveryForm>, 
+  customerOrderCount: number = 0
+): FeeCalculation => {
   const {
     distanceMeters = '0',
     weightKg = '0',
@@ -54,8 +63,26 @@ export const calculateDeliveryFee = (params: Partial<DeliveryForm>): FeeCalculat
 
   const totalSurcharges = weatherSurcharge + offHourSurcharge + weightSurcharge;
   const subtotal = distanceFee + totalSurcharges + expressBonus;
-  const discountAmount = subtotal * (validDiscount / 100);
-  const finalFee = Math.max(0, subtotal - discountAmount);
+  
+  // Calculate manual discount
+  const manualDiscountAmount = subtotal * (validDiscount / 100);
+  
+  // Calculate automatic discount based on customer order count
+  let autoDiscountAmount = 0;
+  let autoDiscountType = '';
+  
+  if (customerOrderCount < 3) {
+    // First 3 orders get 10₹ discount
+    autoDiscountAmount = FIRST_3_ORDERS_DISCOUNT;
+    autoDiscountType = `First 3 Orders (Order #${customerOrderCount + 1})`;
+  } else if (customerOrderCount >= 7) {
+    // After 7 orders, get 5% discount
+    autoDiscountAmount = subtotal * (AFTER_7_ORDERS_DISCOUNT_PERCENT / 100);
+    autoDiscountType = 'Loyalty Discount (7+ Orders)';
+  }
+  
+  const totalDiscountAmount = manualDiscountAmount + autoDiscountAmount;
+  const finalFee = Math.max(0, subtotal - totalDiscountAmount);
   const totalCosts = FUEL_COST_PER_DELIVERY + STAFF_SALARY_PER_DELIVERY + MAINTENANCE_COST_PER_DELIVERY;
   const profit = finalFee - totalCosts;
 
@@ -67,7 +94,9 @@ export const calculateDeliveryFee = (params: Partial<DeliveryForm>): FeeCalculat
     weightSurcharge,
     totalSurcharges,
     subtotal,
-    discountAmount,
+    discountAmount: manualDiscountAmount,
+    autoDiscountAmount,
+    autoDiscountType,
     finalFee,
     totalCosts,
     profit,

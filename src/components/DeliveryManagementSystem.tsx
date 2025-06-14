@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Calculator, Users, TrendingUp, FileSpreadsheet, Package, Download } from 'lucide-react';
 import { 
@@ -79,7 +78,11 @@ const DeliveryManagementSystem = () => {
       return;
     }
 
-    const feeCalculation = calculateDeliveryFee(deliveryForm);
+    // Get current customer order count for automatic discount calculation
+    const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
+    const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
+
+    const feeCalculation = calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
 
     const deliveryRecord: Delivery = {
       id: Date.now(),
@@ -98,8 +101,6 @@ const DeliveryManagementSystem = () => {
       month: currentMonth,
       ...feeCalculation
     };
-
-    const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
     
     setCustomers(prev => ({
       ...prev,
@@ -139,7 +140,7 @@ const DeliveryManagementSystem = () => {
           totalRevenue: newTotalRevenue,
           totalProfit: newTotalProfit,
           totalDeliveries: monthData.totalDeliveries + 1,
-          totalDiscounts: monthData.totalDiscounts + feeCalculation.discountAmount,
+          totalDiscounts: monthData.totalDiscounts + feeCalculation.discountAmount + feeCalculation.autoDiscountAmount,
           totalSurcharges: monthData.totalSurcharges + feeCalculation.totalSurcharges,
           netIncome: newTotalRevenue - monthData.expenses
         }
@@ -155,7 +156,11 @@ const DeliveryManagementSystem = () => {
       isOffHour: false, isFastDelivery: false
     });
 
-    alert(`Delivery processed! Final Fee: ₹${feeCalculation.finalFee.toFixed(2)}`);
+    const discountMessage = feeCalculation.autoDiscountAmount > 0 
+      ? ` (includes ${feeCalculation.autoDiscountType}: ₹${feeCalculation.autoDiscountAmount.toFixed(2)} discount)`
+      : '';
+    
+    alert(`Delivery processed! Final Fee: ₹${feeCalculation.finalFee.toFixed(2)}${discountMessage}`);
   };
 
   // Add expense with validation
@@ -228,7 +233,12 @@ const DeliveryManagementSystem = () => {
     [monthlyData, currentMonth]
   );
   
-  const feePreview = useMemo(() => calculateDeliveryFee(deliveryForm), [deliveryForm]);
+  // Calculate fee preview with current customer order count
+  const feePreview = useMemo(() => {
+    const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
+    const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
+    return calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
+  }, [deliveryForm, customers]);
 
   // Tabs configuration
   const tabs = [

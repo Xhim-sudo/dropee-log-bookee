@@ -25,6 +25,8 @@ export interface Delivery {
   totalSurcharges: number;
   subtotal: number;
   discountAmount: number;
+  autoDiscountAmount: number;
+  autoDiscountType: string;
   finalFee: number;
   totalCosts: number;
   profit: number;
