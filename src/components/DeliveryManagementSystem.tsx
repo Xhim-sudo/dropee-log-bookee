@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { Calculator, Users, TrendingUp, FileSpreadsheet, Package, Download } from 'lucide-react';
+import { Calculator, Users, TrendingUp, FileSpreadsheet, Package, Download, Menu } from 'lucide-react';
 import { 
   CustomerMap, 
   Delivery, 
@@ -29,6 +30,7 @@ const DeliveryManagementSystem = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
   const [cashOnHand, setCashOnHand] = useState(0);
   const [activeTab, setActiveTab] = useState('calculator');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [deliveryForm, setDeliveryForm] = useState<DeliveryFormType>({
     customerName: '',
@@ -50,7 +52,6 @@ const DeliveryManagementSystem = () => {
     category: 'other'
   });
 
-  // Initialize monthly data
   useEffect(() => {
     if (!monthlyData[currentMonth]) {
       setMonthlyData(prev => ({
@@ -78,7 +79,6 @@ const DeliveryManagementSystem = () => {
       return;
     }
 
-    // Get current customer order count for automatic discount calculation
     const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
     const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
 
@@ -163,7 +163,6 @@ const DeliveryManagementSystem = () => {
     alert(`Delivery processed! Final Fee: ₹${feeCalculation.finalFee.toFixed(2)}${discountMessage}`);
   };
 
-  // Add expense with validation
   const addExpense = () => {
     const { description, amount } = expenseForm;
     
@@ -208,7 +207,6 @@ const DeliveryManagementSystem = () => {
     alert(`Expense added: ₹${expenseAmount.toFixed(2)}`);
   };
 
-  // Start new month with confirmation
   const startNewMonth = () => {
     if (window.confirm('Are you sure you want to start a new month? This action cannot be undone.')) {
       const today = new Date();
@@ -233,75 +231,92 @@ const DeliveryManagementSystem = () => {
     [monthlyData, currentMonth]
   );
   
-  // Calculate fee preview with current customer order count
   const feePreview = useMemo(() => {
     const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
     const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
     return calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
   }, [deliveryForm, customers]);
 
-  // Tabs configuration
   const tabs = [
-    { id: 'calculator', label: 'Fee Calculator', icon: Calculator },
+    { id: 'calculator', label: 'Calculator', icon: Calculator },
     { id: 'customers', label: 'Customers', icon: Users },
-    { id: 'reports', label: 'Financials', icon: TrendingUp },
-    { id: 'export', label: 'Data Export', icon: FileSpreadsheet }
+    { id: 'reports', label: 'Reports', icon: TrendingUp },
+    { id: 'export', label: 'Export', icon: FileSpreadsheet }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 p-2 sm:p-4 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center space-x-3">
-              <Package className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dynamic Delivery System</h1>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <div className="text-center md:text-right">
-                <p className="text-sm text-gray-600">Current Month</p>
-                <p className="text-lg font-semibold text-gray-800">{currentMonth}</p>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-sm text-gray-600">Cash on Hand</p>
-                <p className="text-xl md:text-2xl font-bold text-green-600">₹{cashOnHand.toFixed(2)}</p>
+        {/* Mobile-Optimized Header */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6 mb-4 sm:mb-6">
+          <div className="flex flex-col space-y-4">
+            {/* Top Row: Logo and Menu */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <Package className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+                <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800">Dynamic Delivery</h1>
               </div>
               <button
-                onClick={() => exportToExcel(deliveries, customers, monthlyData)}
-                className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="sm:hidden p-2 text-gray-600 hover:text-indigo-600 transition-colors"
               >
-                <Download className="h-4 w-4" />
-                <span>Export to Excel</span>
+                <Menu className="h-6 w-6" />
               </button>
+            </div>
+
+            {/* Stats Row - Mobile Optimized */}
+            <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} sm:block`}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-xs sm:text-sm text-gray-600">Current Month</p>
+                  <p className="text-sm sm:text-lg font-semibold text-gray-800">{currentMonth}</p>
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-xs sm:text-sm text-gray-600">Cash on Hand</p>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">₹{cashOnHand.toFixed(2)}</p>
+                </div>
+                <div className="flex justify-center sm:justify-end">
+                  <button
+                    onClick={() => exportToExcel(deliveries, customers, monthlyData)}
+                    className="flex items-center space-x-1 sm:space-x-2 bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm text-sm"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="hidden sm:inline">Export Excel</span>
+                    <span className="sm:hidden">Export</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg mb-6 overflow-x-auto">
-          <div className="flex">
+        {/* Mobile-Optimized Navigation Tabs */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg mb-4 sm:mb-6">
+          <div className="flex overflow-x-auto scrollbar-hide">
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 flex items-center space-x-2 px-4 py-3 font-medium transition-colors ${
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`flex-shrink-0 flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-3 font-medium transition-colors min-w-[80px] sm:min-w-0 ${
                   activeTab === tab.id
                     ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
                     : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50'
                 }`}
               >
-                <tab.icon className="h-5 w-5" />
-                <span>{tab.label}</span>
+                <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm">{tab.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Tab Content */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {activeTab === 'calculator' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6">
               <DeliveryForm
                 deliveryForm={deliveryForm}
                 setDeliveryForm={setDeliveryForm}
@@ -319,7 +334,7 @@ const DeliveryManagementSystem = () => {
           )}
 
           {activeTab === 'reports' && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <FinancialOverview
                 currentMonthData={currentMonthData}
                 expenseForm={expenseForm}

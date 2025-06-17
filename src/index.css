@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,5 +100,51 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Mobile-specific optimizations */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Improve tap targets for mobile */
+  @media (max-width: 640px) {
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better text sizing on mobile */
+    .text-mobile-base {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    
+    /* Prevent zoom on input focus in iOS Safari */
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="email"],
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+  
+  /* Smooth scrolling for mobile */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 }
