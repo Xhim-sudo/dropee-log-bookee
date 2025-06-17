@@ -2,7 +2,7 @@
 import { DeliveryForm } from '../types/delivery';
 
 // Pricing & Cost Configuration
-export const RATE_PER_METER = 0.05;
+export const RATE_PER_METER = 0.635;
 export const BAD_WEATHER_SURCHARGE = 30;
 export const OFF_HOUR_SURCHARGE = 50;
 export const FAST_DELIVERY_BONUS = 20;
