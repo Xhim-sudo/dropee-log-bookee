@@ -9,13 +9,11 @@ import {
 } from '../types/delivery';
 import { FeeCalculation } from '../utils/deliveryCalculations';
 
-// Import components
-import DeliveryForm from './DeliveryForm';
-import FeePreview from './FeePreview';
-import CustomerList from './CustomerList';
-import FinancialOverview from './FinancialOverview';
-import RecentDeliveries from './RecentDeliveries';
-import DataExport from './DataExport';
+// Import tab components
+import CalculatorTab from './tabs/CalculatorTab';
+import CustomersTab from './tabs/CustomersTab';
+import ReportsTab from './tabs/ReportsTab';
+import ExportTab from './tabs/ExportTab';
 
 interface TabContentProps {
   activeTab: string;
@@ -51,37 +49,30 @@ const TabContent: React.FC<TabContentProps> = ({
   return (
     <div className="space-y-4 sm:space-y-6">
       {activeTab === 'calculator' && (
-        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6">
-          <DeliveryForm
-            deliveryForm={deliveryForm}
-            setDeliveryForm={setDeliveryForm}
-            onProcessDelivery={onProcessDelivery}
-          />
-          <FeePreview
-            feePreview={feePreview}
-            deliveryForm={deliveryForm}
-          />
-        </div>
+        <CalculatorTab
+          deliveryForm={deliveryForm}
+          setDeliveryForm={setDeliveryForm}
+          onProcessDelivery={onProcessDelivery}
+          feePreview={feePreview}
+        />
       )}
 
       {activeTab === 'customers' && (
-        <CustomerList customers={customers} />
+        <CustomersTab customers={customers} />
       )}
 
       {activeTab === 'reports' && (
-        <div className="space-y-4 sm:space-y-6">
-          <FinancialOverview
-            currentMonthData={currentMonthData}
-            expenseForm={expenseForm}
-            setExpenseForm={setExpenseForm}
-            onAddExpense={onAddExpense}
-          />
-          <RecentDeliveries deliveries={deliveries} />
-        </div>
+        <ReportsTab
+          deliveries={deliveries}
+          currentMonthData={currentMonthData}
+          expenseForm={expenseForm}
+          setExpenseForm={setExpenseForm}
+          onAddExpense={onAddExpense}
+        />
       )}
 
       {activeTab === 'export' && (
-        <DataExport
+        <ExportTab
           deliveries={deliveries}
           customers={customers}
           monthlyData={monthlyData}
