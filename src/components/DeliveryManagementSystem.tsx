@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Calculator, Users, TrendingUp, FileSpreadsheet, Package, Download, Menu } from 'lucide-react';
 import { 
   CustomerMap, 
   Delivery, 
@@ -12,15 +11,11 @@ import {
   calculateDeliveryFee, 
   validateDeliveryForm
 } from '../utils/deliveryCalculations';
-import { exportToExcel } from '../utils/excelExport';
 
-// Import components
-import DeliveryForm from './DeliveryForm';
-import FeePreview from './FeePreview';
-import CustomerList from './CustomerList';
-import FinancialOverview from './FinancialOverview';
-import RecentDeliveries from './RecentDeliveries';
-import DataExport from './DataExport';
+// Import new focused components
+import AppHeader from './AppHeader';
+import NavigationTabs from './NavigationTabs';
+import TabContent from './TabContent';
 
 const DeliveryManagementSystem = () => {
   // State Management
@@ -237,123 +232,40 @@ const DeliveryManagementSystem = () => {
     return calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
   }, [deliveryForm, customers]);
 
-  const tabs = [
-    { id: 'calculator', label: 'Calculator', icon: Calculator },
-    { id: 'customers', label: 'Customers', icon: Users },
-    { id: 'reports', label: 'Reports', icon: TrendingUp },
-    { id: 'export', label: 'Export', icon: FileSpreadsheet }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 p-2 sm:p-4 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Mobile-Optimized Header */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6 mb-4 sm:mb-6">
-          <div className="flex flex-col space-y-4">
-            {/* Top Row: Logo and Menu */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <Package className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
-                <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800">Dynamic Delivery</h1>
-              </div>
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="sm:hidden p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
+        <AppHeader
+          currentMonth={currentMonth}
+          cashOnHand={cashOnHand}
+          deliveries={deliveries}
+          customers={customers}
+          monthlyData={monthlyData}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
 
-            {/* Stats Row - Mobile Optimized */}
-            <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} sm:block`}>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <div className="text-center sm:text-left">
-                  <p className="text-xs sm:text-sm text-gray-600">Current Month</p>
-                  <p className="text-sm sm:text-lg font-semibold text-gray-800">{currentMonth}</p>
-                </div>
-                <div className="text-center sm:text-left">
-                  <p className="text-xs sm:text-sm text-gray-600">Cash on Hand</p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">₹{cashOnHand.toFixed(2)}</p>
-                </div>
-                <div className="flex justify-center sm:justify-end">
-                  <button
-                    onClick={() => exportToExcel(deliveries, customers, monthlyData)}
-                    className="flex items-center space-x-1 sm:space-x-2 bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span className="hidden sm:inline">Export Excel</span>
-                    <span className="sm:hidden">Export</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <NavigationTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
 
-        {/* Mobile-Optimized Navigation Tabs */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg mb-4 sm:mb-6">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`flex-shrink-0 flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-3 font-medium transition-colors min-w-[80px] sm:min-w-0 ${
-                  activeTab === tab.id
-                    ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50'
-                }`}
-              >
-                <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="text-xs sm:text-sm">{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="space-y-4 sm:space-y-6">
-          {activeTab === 'calculator' && (
-            <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6">
-              <DeliveryForm
-                deliveryForm={deliveryForm}
-                setDeliveryForm={setDeliveryForm}
-                onProcessDelivery={processDelivery}
-              />
-              <FeePreview
-                feePreview={feePreview}
-                deliveryForm={deliveryForm}
-              />
-            </div>
-          )}
-
-          {activeTab === 'customers' && (
-            <CustomerList customers={customers} />
-          )}
-
-          {activeTab === 'reports' && (
-            <div className="space-y-4 sm:space-y-6">
-              <FinancialOverview
-                currentMonthData={currentMonthData}
-                expenseForm={expenseForm}
-                setExpenseForm={setExpenseForm}
-                onAddExpense={addExpense}
-              />
-              <RecentDeliveries deliveries={deliveries} />
-            </div>
-          )}
-
-          {activeTab === 'export' && (
-            <DataExport
-              deliveries={deliveries}
-              customers={customers}
-              monthlyData={monthlyData}
-              onStartNewMonth={startNewMonth}
-            />
-          )}
-        </div>
+        <TabContent
+          activeTab={activeTab}
+          deliveryForm={deliveryForm}
+          setDeliveryForm={setDeliveryForm}
+          onProcessDelivery={processDelivery}
+          feePreview={feePreview}
+          customers={customers}
+          deliveries={deliveries}
+          currentMonthData={currentMonthData}
+          expenseForm={expenseForm}
+          setExpenseForm={setExpenseForm}
+          onAddExpense={addExpense}
+          monthlyData={monthlyData}
+          onStartNewMonth={startNewMonth}
+        />
       </div>
     </div>
   );
