@@ -9,7 +9,221 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          last_order_date: string | null
+          name: string
+          order_count: number
+          phone: string
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          last_order_date?: string | null
+          name: string
+          order_count?: number
+          phone: string
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          last_order_date?: string | null
+          name?: string
+          order_count?: number
+          phone?: string
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      deliveries: {
+        Row: {
+          auto_discount_amount: number | null
+          auto_discount_type: string | null
+          created_at: string
+          customer_address: string
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_date: string
+          discount_amount: number | null
+          distance_fee: number
+          distance_meters: number
+          express_bonus: number | null
+          final_fee: number
+          id: string
+          is_bad_weather: boolean | null
+          is_fast_delivery: boolean | null
+          is_off_hour: boolean | null
+          manual_discount_percent: number | null
+          month: string
+          off_hour_surcharge: number | null
+          order_description: string | null
+          order_value: number | null
+          profit: number
+          subtotal: number
+          total_costs: number
+          total_surcharges: number
+          weather_surcharge: number | null
+          weight_kg: number | null
+          weight_surcharge: number | null
+        }
+        Insert: {
+          auto_discount_amount?: number | null
+          auto_discount_type?: string | null
+          created_at?: string
+          customer_address: string
+          customer_id?: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_date?: string
+          discount_amount?: number | null
+          distance_fee: number
+          distance_meters: number
+          express_bonus?: number | null
+          final_fee: number
+          id?: string
+          is_bad_weather?: boolean | null
+          is_fast_delivery?: boolean | null
+          is_off_hour?: boolean | null
+          manual_discount_percent?: number | null
+          month: string
+          off_hour_surcharge?: number | null
+          order_description?: string | null
+          order_value?: number | null
+          profit: number
+          subtotal: number
+          total_costs: number
+          total_surcharges: number
+          weather_surcharge?: number | null
+          weight_kg?: number | null
+          weight_surcharge?: number | null
+        }
+        Update: {
+          auto_discount_amount?: number | null
+          auto_discount_type?: string | null
+          created_at?: string
+          customer_address?: string
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string
+          delivery_date?: string
+          discount_amount?: number | null
+          distance_fee?: number
+          distance_meters?: number
+          express_bonus?: number | null
+          final_fee?: number
+          id?: string
+          is_bad_weather?: boolean | null
+          is_fast_delivery?: boolean | null
+          is_off_hour?: boolean | null
+          manual_discount_percent?: number | null
+          month?: string
+          off_hour_surcharge?: number | null
+          order_description?: string | null
+          order_value?: number | null
+          profit?: number
+          subtotal?: number
+          total_costs?: number
+          total_surcharges?: number
+          weather_surcharge?: number | null
+          weight_kg?: number | null
+          weight_surcharge?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string
+          expense_date: string
+          id: string
+          month: string
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          description: string
+          expense_date?: string
+          id?: string
+          month: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          month?: string
+        }
+        Relationships: []
+      }
+      monthly_summary: {
+        Row: {
+          cash_on_hand_start: number
+          created_at: string
+          id: string
+          month: string
+          net_income: number
+          total_deliveries: number
+          total_discounts: number
+          total_expenses: number
+          total_profit: number
+          total_revenue: number
+          total_surcharges: number
+          updated_at: string
+        }
+        Insert: {
+          cash_on_hand_start?: number
+          created_at?: string
+          id?: string
+          month: string
+          net_income?: number
+          total_deliveries?: number
+          total_discounts?: number
+          total_expenses?: number
+          total_profit?: number
+          total_revenue?: number
+          total_surcharges?: number
+          updated_at?: string
+        }
+        Update: {
+          cash_on_hand_start?: number
+          created_at?: string
+          id?: string
+          month?: string
+          net_income?: number
+          total_deliveries?: number
+          total_discounts?: number
+          total_expenses?: number
+          total_profit?: number
+          total_revenue?: number
+          total_surcharges?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
