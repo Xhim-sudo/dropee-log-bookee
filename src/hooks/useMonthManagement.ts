@@ -17,29 +17,40 @@ export const useMonthManagement = (monthlyData: { [key: string]: any }, cashOnHa
 
   // Initialize current month data if it doesn't exist
   useEffect(() => {
-    if (!monthlyData[currentMonth]) {
-      const initializeMonth = async () => {
-        const { error } = await supabase
-          .from('monthly_summary')
-          .upsert({
-            month: currentMonth,
-            total_deliveries: 0,
-            total_revenue: 0,
-            total_profit: 0,
-            total_discounts: 0,
-            total_surcharges: 0,
-            total_expenses: 0,
-            net_income: 0,
-            cash_on_hand_start: cashOnHand,
-          });
+    const initializeMonth = async () => {
+      if (!monthlyData[currentMonth]) {
+        console.log('Initializing month data for:', currentMonth);
+        
+        try {
+          const { error } = await supabase
+            .from('monthly_summary')
+            .upsert({
+              month: currentMonth,
+              total_deliveries: 0,
+              total_revenue: 0,
+              total_profit: 0,
+              total_discounts: 0,
+              total_surcharges: 0,
+              total_expenses: 0,
+              net_income: 0,
+              cash_on_hand_start: cashOnHand,
+            }, {
+              onConflict: 'month'
+            });
 
-        if (!error) {
-          queryClient.invalidateQueries({ queryKey: ['monthly_summary'] });
+          if (error) {
+            console.error('Error initializing month:', error);
+          } else {
+            console.log('Month initialized successfully:', currentMonth);
+            queryClient.invalidateQueries({ queryKey: ['monthly_summary'] });
+          }
+        } catch (error) {
+          console.error('Exception during month initialization:', error);
         }
-      };
+      }
+    };
 
-      initializeMonth();
-    }
+    initializeMonth();
   }, [currentMonth, cashOnHand, monthlyData, queryClient]);
 
   return {
