@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calculator, Users, TrendingUp, FileSpreadsheet } from 'lucide-react';
+import { Calculator, Users, TrendingUp, FileSpreadsheet, Store } from 'lucide-react';
 
 interface NavigationTabsProps {
   activeTab: string;
@@ -16,6 +16,7 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({
   const tabs = [
     { id: 'calculator', label: 'Calculator', icon: Calculator },
     { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'vendors', label: 'Vendors', icon: Store },
     { id: 'reports', label: 'Reports', icon: TrendingUp },
     { id: 'export', label: 'Export', icon: FileSpreadsheet }
   ];

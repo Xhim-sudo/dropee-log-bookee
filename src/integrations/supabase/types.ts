@@ -49,19 +49,26 @@ export type Database = {
         Row: {
           auto_discount_amount: number | null
           auto_discount_type: string | null
+          auto_distance_meters: number | null
           created_at: string
           customer_address: string
           customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_date: string
+          delivery_latitude: number | null
+          delivery_longitude: number | null
           discount_amount: number | null
           distance_fee: number
           distance_meters: number
+          distance_source: string | null
+          duration_minutes: number | null
+          end_time: string | null
           express_bonus: number | null
           final_fee: number
           id: string
           is_bad_weather: boolean | null
+          is_defective: boolean | null
           is_fast_delivery: boolean | null
           is_off_hour: boolean | null
           manual_discount_percent: number | null
@@ -69,10 +76,15 @@ export type Database = {
           off_hour_surcharge: number | null
           order_description: string | null
           order_value: number | null
+          performance_score: number | null
+          pickup_latitude: number | null
+          pickup_longitude: number | null
           profit: number
+          start_time: string | null
           subtotal: number
           total_costs: number
           total_surcharges: number
+          vendor_id: string | null
           weather_surcharge: number | null
           weight_kg: number | null
           weight_surcharge: number | null
@@ -80,19 +92,26 @@ export type Database = {
         Insert: {
           auto_discount_amount?: number | null
           auto_discount_type?: string | null
+          auto_distance_meters?: number | null
           created_at?: string
           customer_address: string
           customer_id?: string | null
           customer_name: string
           customer_phone: string
           delivery_date?: string
+          delivery_latitude?: number | null
+          delivery_longitude?: number | null
           discount_amount?: number | null
           distance_fee: number
           distance_meters: number
+          distance_source?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
           express_bonus?: number | null
           final_fee: number
           id?: string
           is_bad_weather?: boolean | null
+          is_defective?: boolean | null
           is_fast_delivery?: boolean | null
           is_off_hour?: boolean | null
           manual_discount_percent?: number | null
@@ -100,10 +119,15 @@ export type Database = {
           off_hour_surcharge?: number | null
           order_description?: string | null
           order_value?: number | null
+          performance_score?: number | null
+          pickup_latitude?: number | null
+          pickup_longitude?: number | null
           profit: number
+          start_time?: string | null
           subtotal: number
           total_costs: number
           total_surcharges: number
+          vendor_id?: string | null
           weather_surcharge?: number | null
           weight_kg?: number | null
           weight_surcharge?: number | null
@@ -111,19 +135,26 @@ export type Database = {
         Update: {
           auto_discount_amount?: number | null
           auto_discount_type?: string | null
+          auto_distance_meters?: number | null
           created_at?: string
           customer_address?: string
           customer_id?: string | null
           customer_name?: string
           customer_phone?: string
           delivery_date?: string
+          delivery_latitude?: number | null
+          delivery_longitude?: number | null
           discount_amount?: number | null
           distance_fee?: number
           distance_meters?: number
+          distance_source?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
           express_bonus?: number | null
           final_fee?: number
           id?: string
           is_bad_weather?: boolean | null
+          is_defective?: boolean | null
           is_fast_delivery?: boolean | null
           is_off_hour?: boolean | null
           manual_discount_percent?: number | null
@@ -131,10 +162,15 @@ export type Database = {
           off_hour_surcharge?: number | null
           order_description?: string | null
           order_value?: number | null
+          performance_score?: number | null
+          pickup_latitude?: number | null
+          pickup_longitude?: number | null
           profit?: number
+          start_time?: string | null
           subtotal?: number
           total_costs?: number
           total_surcharges?: number
+          vendor_id?: string | null
           weather_surcharge?: number | null
           weight_kg?: number | null
           weight_surcharge?: number | null
@@ -145,6 +181,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -221,6 +264,51 @@ export type Database = {
           total_revenue?: number
           total_surcharges?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          address: string
+          commission_rate: number | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          phone: string | null
+          rating: number | null
+          updated_at: string
+          vendor_type: string
+        }
+        Insert: {
+          address: string
+          commission_rate?: number | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string
+          vendor_type?: string
+        }
+        Update: {
+          address?: string
+          commission_rate?: number | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string
+          vendor_type?: string
         }
         Relationships: []
       }

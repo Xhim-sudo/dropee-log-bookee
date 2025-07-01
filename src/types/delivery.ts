@@ -39,6 +39,21 @@ export interface Delivery {
   isOffHour: boolean;
   isFastDelivery: boolean;
   distanceMeters: number;
+  
+  // New vendor and tracking fields
+  vendorId?: string;
+  vendorName?: string;
+  pickupLatitude?: number;
+  pickupLongitude?: number;
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  isDefective?: boolean;
+  autoDistanceMeters?: number;
+  distanceSource?: string;
+  performanceScore?: number;
 }
 
 export interface MonthlyData {
@@ -65,6 +80,9 @@ export interface DeliveryForm {
   isBadWeather: boolean;
   isOffHour: boolean;
   isFastDelivery: boolean;
+  
+  // New vendor field
+  vendorId: string;
 }
 
 export interface ExpenseForm {

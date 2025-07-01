@@ -12,6 +12,7 @@ import { FeeCalculation } from '../utils/deliveryCalculations';
 // Import tab components
 import CalculatorTab from './tabs/CalculatorTab';
 import CustomersTab from './tabs/CustomersTab';
+import VendorsTab from './tabs/VendorsTab';
 import ReportsTab from './tabs/ReportsTab';
 import ExportTab from './tabs/ExportTab';
 
@@ -59,6 +60,10 @@ const TabContent: React.FC<TabContentProps> = ({
 
       {activeTab === 'customers' && (
         <CustomersTab customers={customers} />
+      )}
+
+      {activeTab === 'vendors' && (
+        <VendorsTab />
       )}
 
       {activeTab === 'reports' && (

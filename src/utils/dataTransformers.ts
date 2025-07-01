@@ -71,6 +71,20 @@ export const transformDeliveriesData = (deliveriesData: any[]): Delivery[] => {
       isOffHour: delivery.is_off_hour || false,
       isFastDelivery: delivery.is_fast_delivery || false,
       distanceMeters: delivery.distance_meters || 0,
+      
+      // New vendor and tracking fields
+      vendorId: delivery.vendor_id || undefined,
+      pickupLatitude: delivery.pickup_latitude || undefined,
+      pickupLongitude: delivery.pickup_longitude || undefined,
+      deliveryLatitude: delivery.delivery_latitude || undefined,
+      deliveryLongitude: delivery.delivery_longitude || undefined,
+      startTime: delivery.start_time || undefined,
+      endTime: delivery.end_time || undefined,
+      durationMinutes: delivery.duration_minutes || undefined,
+      isDefective: delivery.is_defective || false,
+      autoDistanceMeters: delivery.auto_distance_meters || undefined,
+      distanceSource: delivery.distance_source || 'manual',
+      performanceScore: delivery.performance_score || undefined,
     };
   }).filter(delivery => delivery !== null);
   

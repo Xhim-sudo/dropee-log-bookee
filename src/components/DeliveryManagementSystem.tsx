@@ -34,6 +34,7 @@ const DeliveryManagementSystem = () => {
     isBadWeather: false,
     isOffHour: false,
     isFastDelivery: false,
+    vendorId: '', // Initialize vendor field
   });
 
   const [expenseForm, setExpenseForm] = useState<ExpenseForm>({
