@@ -1,16 +1,24 @@
 
 import React from 'react';
-import { Users, Phone, MapPin, Star } from 'lucide-react';
+import { Users, Phone, MapPin, Star, Trash2 } from 'lucide-react';
 import { CustomerMap } from '../types/delivery';
+import { useDataOperations } from '../hooks/useDataOperations';
 
 interface CustomerListProps {
   customers: CustomerMap;
 }
 
 const CustomerList: React.FC<CustomerListProps> = ({ customers }) => {
+  const { deleteCustomer, isDeleting } = useDataOperations();
   const topCustomers = Object.values(customers)
     .sort((a, b) => b.totalSpent - a.totalSpent)
     .slice(0, 5);
+
+  const handleDeleteCustomer = (customerKey: string, customerName: string) => {
+    if (window.confirm(`Are you sure you want to delete ${customerName} and all their delivery records? This action cannot be undone.`)) {
+      deleteCustomer(customerKey);
+    }
+  };
 
   return (
     <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6">
@@ -27,8 +35,8 @@ const CustomerList: React.FC<CustomerListProps> = ({ customers }) => {
               <p className="text-sm sm:text-base">No customers yet. Process your first delivery to see customers here.</p>
             </div>
           ) : (
-            Object.values(customers).map((customer, index) => (
-              <div key={index} className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+            Object.entries(customers).map(([customerKey, customer]) => (
+              <div key={customerKey} className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -37,9 +45,19 @@ const CustomerList: React.FC<CustomerListProps> = ({ customers }) => {
                         <span className="truncate">{customer.name}</span>
                       </h3>
                     </div>
-                    <div className="text-right ml-3">
-                      <div className="text-base sm:text-lg font-bold text-green-600">₹{customer.totalSpent.toFixed(2)}</div>
-                      <div className="text-xs sm:text-sm text-gray-500">{customer.orderCount} orders</div>
+                    <div className="flex items-center space-x-3 ml-3">
+                      <div className="text-right">
+                        <div className="text-base sm:text-lg font-bold text-green-600">₹{customer.totalSpent.toFixed(2)}</div>
+                        <div className="text-xs sm:text-sm text-gray-500">{customer.orderCount} orders</div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteCustomer(customerKey, customer.name)}
+                        disabled={isDeleting}
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete customer and all deliveries"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                   

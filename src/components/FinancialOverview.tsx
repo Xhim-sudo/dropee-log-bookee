@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign, TrendingUp, Package, Calendar } from 'lucide-react';
+import { DollarSign, TrendingUp, Package, Calendar, AlertCircle } from 'lucide-react';
 import { MonthlyData, ExpenseForm } from '../types/delivery';
 
 interface FinancialOverviewProps {
@@ -16,6 +16,15 @@ const FinancialOverview: React.FC<FinancialOverviewProps> = ({
   setExpenseForm,
   onAddExpense
 }) => {
+  // Calculate fixed costs (fuel and maintenance)
+  const fixedCosts = currentMonthData.deliveries?.reduce((total, delivery) => {
+    const fuelCost = delivery.distanceMeters * 0.002; // ₹2 per km
+    const maintenanceCost = delivery.distanceMeters * 0.001; // ₹1 per km
+    return total + fuelCost + maintenanceCost;
+  }, 0) || 0;
+
+  const totalFixedCosts = fixedCosts + currentMonthData.expenses;
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Mobile-Optimized Financial Cards */}
@@ -62,7 +71,7 @@ const FinancialOverview: React.FC<FinancialOverviewProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Monthly Breakdown */}
+        {/* Monthly Breakdown with Fixed Costs */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6">
           <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Monthly Financial Breakdown</h3>
           <div className="space-y-3">
@@ -78,9 +87,20 @@ const FinancialOverview: React.FC<FinancialOverviewProps> = ({
               <span className="text-sm sm:text-base text-gray-600">Total Surcharges</span>
               <span className="font-medium text-amber-600 text-sm sm:text-base">+₹{currentMonthData.totalSurcharges.toFixed(2)}</span>
             </div>
+            <div className="flex justify-between py-2 border-b bg-orange-50 px-3 rounded">
+              <span className="text-sm sm:text-base text-gray-600 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1 text-orange-500" />
+                Fixed Costs (Fuel + Maintenance)
+              </span>
+              <span className="font-medium text-orange-600 text-sm sm:text-base">-₹{fixedCosts.toFixed(2)}</span>
+            </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-sm sm:text-base text-gray-600">Other Expenses</span>
               <span className="font-medium text-red-600 text-sm sm:text-base">-₹{currentMonthData.expenses.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b font-semibold bg-red-50 px-3 rounded">
+              <span className="text-sm sm:text-base text-gray-700">Total Fixed Costs</span>
+              <span className="text-red-700 text-sm sm:text-base">-₹{totalFixedCosts.toFixed(2)}</span>
             </div>
             <div className="flex justify-between py-3 text-base sm:text-lg font-bold bg-indigo-50 px-3 rounded-lg">
               <span>Net Income</span>
