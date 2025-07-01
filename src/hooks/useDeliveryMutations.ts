@@ -46,7 +46,7 @@ export const useDeliveryMutations = (
         customerName: '', customerPhone: '', customerAddress: '',
         orderDescription: '', distanceMeters: '', orderValue: '',
         weightKg: '', manualDiscountPercent: '', isBadWeather: false,
-        isOffHour: false, isFastDelivery: false
+        isOffHour: false, isFastDelivery: false, vendorId: ''
       });
 
       const discountMessage = deliveryRecord.autoDiscountAmount > 0 
