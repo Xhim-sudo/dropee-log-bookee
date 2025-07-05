@@ -4,7 +4,7 @@ import { calculateDeliveryFee, validateDeliveryForm } from '../utils/deliveryCal
 import { upsertCustomer } from './customerService';
 import { insertDeliveryRecord, DeliveryRecord } from './deliveryRecordService';
 
-export { DeliveryRecord } from './deliveryRecordService';
+export type { DeliveryRecord } from './deliveryRecordService';
 
 export const processDeliveryRecord = async (
   deliveryRecord: DeliveryRecord,
