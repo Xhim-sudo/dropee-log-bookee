@@ -54,25 +54,25 @@ const CalculatorTab: React.FC<CalculatorTabProps> = ({
     // Auto-update the distance in the form if it's significantly different
     const currentDistance = parseInt(deliveryForm.distanceMeters) || 0;
     if (Math.abs(distance - currentDistance) > 100) {
-      setDeliveryForm(prev => ({ ...prev, distanceMeters: distance.toString() }));
+      setDeliveryForm({ ...deliveryForm, distanceMeters: distance.toString() });
     }
   };
 
   const handleProcessDelivery = () => {
     // Store timer and location data in form before processing
-    const enhancedForm = {
+    const enhancedForm: DeliveryFormType = {
       ...deliveryForm,
       // Add timer data
-      startTime: timerData.startTime,
-      endTime: timerData.endTime,
-      durationMinutes: timerData.duration,
+      startTime: timerData.startTime || undefined,
+      endTime: timerData.endTime || undefined,
+      durationMinutes: timerData.duration || undefined,
       // Add location data
       pickupLatitude: locationData.pickup?.latitude,
       pickupLongitude: locationData.pickup?.longitude,
       deliveryLatitude: locationData.delivery?.latitude,
       deliveryLongitude: locationData.delivery?.longitude,
       // Add auto distance
-      autoDistanceMeters: autoDistance,
+      autoDistanceMeters: autoDistance || undefined,
       distanceSource: autoDistance ? 'auto' : 'manual'
     };
     
