@@ -82,7 +82,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({
                 <SelectValue placeholder="Select vendor or pickup location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No specific vendor</SelectItem>
+                <SelectItem value="none">No specific vendor</SelectItem>
                 {vendors.map((vendor) => (
                   <SelectItem key={vendor.id} value={vendor.id}>
                     <div className="flex items-center">

@@ -40,7 +40,7 @@ export interface Delivery {
   isFastDelivery: boolean;
   distanceMeters: number;
   
-  // New vendor and tracking fields
+  // Enhanced vendor and tracking fields
   vendorId?: string;
   vendorName?: string;
   pickupLatitude?: number;
@@ -81,8 +81,19 @@ export interface DeliveryForm {
   isOffHour: boolean;
   isFastDelivery: boolean;
   
-  // New vendor field
+  // Enhanced vendor and tracking fields
   vendorId: string;
+  
+  // Enhanced tracking data (added during processing)
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  pickupLatitude?: number;
+  pickupLongitude?: number;
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
+  autoDistanceMeters?: number;
+  distanceSource?: string;
 }
 
 export interface ExpenseForm {
