@@ -29,13 +29,25 @@ export interface DeliveryRecord {
   finalFee: number;
   totalCosts: number;
   profit: number;
+  
+  // Enhanced tracking fields
+  vendorId?: string;
+  pickupLatitude?: number;
+  pickupLongitude?: number;
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  autoDistanceMeters?: number;
+  distanceSource?: string;
 }
 
 export const processDeliveryRecord = async (
   deliveryRecord: DeliveryRecord,
   customers: CustomerMap
 ): Promise<DeliveryRecord> => {
-  console.log('Processing delivery record:', deliveryRecord);
+  console.log('Processing enhanced delivery record:', deliveryRecord);
   
   try {
     // First, upsert customer
@@ -66,7 +78,7 @@ export const processDeliveryRecord = async (
 
     console.log('Customer upserted successfully:', customerData);
 
-    // Insert delivery record
+    // Insert enhanced delivery record
     const { error: deliveryError } = await supabase
       .from('deliveries')
       .insert({
@@ -96,6 +108,18 @@ export const processDeliveryRecord = async (
         total_costs: deliveryRecord.totalCosts,
         profit: deliveryRecord.profit,
         month: deliveryRecord.month,
+        
+        // Enhanced tracking data
+        vendor_id: deliveryRecord.vendorId || null,
+        pickup_latitude: deliveryRecord.pickupLatitude || null,
+        pickup_longitude: deliveryRecord.pickupLongitude || null,
+        delivery_latitude: deliveryRecord.deliveryLatitude || null,
+        delivery_longitude: deliveryRecord.deliveryLongitude || null,
+        start_time: deliveryRecord.startTime || null,
+        end_time: deliveryRecord.endTime || null,
+        duration_minutes: deliveryRecord.durationMinutes || null,
+        auto_distance_meters: deliveryRecord.autoDistanceMeters || null,
+        distance_source: deliveryRecord.distanceSource || 'manual',
       });
 
     if (deliveryError) {
@@ -103,7 +127,7 @@ export const processDeliveryRecord = async (
       throw deliveryError;
     }
 
-    console.log('Delivery inserted successfully');
+    console.log('Enhanced delivery inserted successfully');
     return deliveryRecord;
 
   } catch (error) {
@@ -113,11 +137,21 @@ export const processDeliveryRecord = async (
 };
 
 export const createDeliveryRecord = (
-  deliveryForm: DeliveryForm,
+  deliveryForm: DeliveryForm & {
+    startTime?: string;
+    endTime?: string;
+    durationMinutes?: number;
+    pickupLatitude?: number;
+    pickupLongitude?: number;
+    deliveryLatitude?: number;
+    deliveryLongitude?: number;
+    autoDistanceMeters?: number;
+    distanceSource?: string;
+  },
   currentMonth: string,
   customers: CustomerMap
 ): DeliveryRecord => {
-  console.log('Creating delivery record from form:', deliveryForm);
+  console.log('Creating enhanced delivery record from form:', deliveryForm);
   
   const validationError = validateDeliveryForm(deliveryForm);
   if (validationError) {
@@ -146,9 +180,21 @@ export const createDeliveryRecord = (
     isOffHour: deliveryForm.isOffHour,
     isFastDelivery: deliveryForm.isFastDelivery,
     month: currentMonth,
-    ...feeCalculation
+    ...feeCalculation,
+    
+    // Enhanced tracking data
+    vendorId: deliveryForm.vendorId || undefined,
+    pickupLatitude: deliveryForm.pickupLatitude,
+    pickupLongitude: deliveryForm.pickupLongitude,
+    deliveryLatitude: deliveryForm.deliveryLatitude,
+    deliveryLongitude: deliveryForm.deliveryLongitude,
+    startTime: deliveryForm.startTime,
+    endTime: deliveryForm.endTime,
+    durationMinutes: deliveryForm.durationMinutes,
+    autoDistanceMeters: deliveryForm.autoDistanceMeters,
+    distanceSource: deliveryForm.distanceSource || 'manual'
   };
   
-  console.log('Final delivery record created:', deliveryRecord);
+  console.log('Final enhanced delivery record created:', deliveryRecord);
   return deliveryRecord;
 };
