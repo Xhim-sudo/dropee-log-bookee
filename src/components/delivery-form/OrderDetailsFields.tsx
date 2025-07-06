@@ -17,6 +17,36 @@ export const OrderDetailsFields: React.FC<OrderDetailsFieldsProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Distance (meters)</label>
+          <input 
+            type="number" 
+            min="0"
+            step="1"
+            inputMode="numeric"
+            value={deliveryForm.distanceMeters} 
+            onChange={(e) => onFormChange({ distanceMeters: e.target.value })} 
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base" 
+            placeholder="e.g., 2500" 
+          />
+          <p className="text-xs text-gray-500 mt-1">Enter delivery distance in meters</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Order Value (₹)</label>
+          <input 
+            type="number" 
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={deliveryForm.orderValue} 
+            onChange={(e) => onFormChange({ orderValue: e.target.value })} 
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base" 
+            placeholder="e.g., 450.00" 
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
           <input 
             type="number" 
