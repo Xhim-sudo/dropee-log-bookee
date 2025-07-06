@@ -1,10 +1,9 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   DeliveryForm as DeliveryFormType, 
   ExpenseForm 
 } from '../types/delivery';
-import { calculateDeliveryFee } from '../utils/deliveryCalculations';
+import { calculateDeliveryFee, FeeCalculation } from '../utils/deliveryCalculations';
 
 // Import new focused hooks
 import { useDeliveryData } from '../hooks/useDeliveryData';
@@ -21,6 +20,28 @@ const DeliveryManagementSystem = () => {
   const [cashOnHand, setCashOnHand] = useState(0);
   const [activeTab, setActiveTab] = useState('calculator');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [feePreview, setFeePreview] = useState<FeeCalculation>({
+    distanceFee: 0,
+    weatherSurcharge: 0,
+    offHourSurcharge: 0,
+    expressBonus: 0,
+    weightSurcharge: 0,
+    totalSurcharges: 0,
+    subtotal: 0,
+    discountAmount: 0,
+    autoDiscountAmount: 0,
+    autoDiscountType: '',
+    finalFee: 0,
+    totalCosts: 0,
+    profit: 0,
+    distanceKm: '0.00',
+    distanceTier: undefined,
+    baseTierFee: undefined,
+    excessDistanceMeters: undefined,
+    excessDistanceFee: undefined,
+    isEssentialMode: false,
+    essentialModeDiscount: undefined
+  });
 
   const [deliveryForm, setDeliveryForm] = useState<DeliveryFormType>({
     customerName: '',
@@ -56,6 +77,23 @@ const DeliveryManagementSystem = () => {
     setCashOnHand
   );
 
+  // Effect to calculate fee preview when form changes
+  useEffect(() => {
+    const calculateFeePreview = async () => {
+      try {
+        const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
+        const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
+        const calculation = await calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
+        setFeePreview(calculation);
+      } catch (error) {
+        console.error('Error calculating fee preview:', error);
+        // Keep the previous preview or set to default values on error
+      }
+    };
+
+    calculateFeePreview();
+  }, [deliveryForm, customers]);
+
   // Memoized calculations for performance
   const currentMonthData = useMemo(() => 
     monthlyData[currentMonth] || {
@@ -71,12 +109,6 @@ const DeliveryManagementSystem = () => {
     }, 
     [monthlyData, currentMonth]
   );
-  
-  const feePreview = useMemo(() => {
-    const customerId = `${deliveryForm.customerName.toLowerCase().trim()}_${deliveryForm.customerPhone}`;
-    const currentCustomerOrderCount = customers[customerId]?.orderCount || 0;
-    return calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
-  }, [deliveryForm, customers]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 p-2 sm:p-4 font-sans">
