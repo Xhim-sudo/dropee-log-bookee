@@ -1,7 +1,8 @@
 
 import { DeliveryForm } from '../types/delivery';
+import { supabase } from '../integrations/supabase/client';
 
-// Pricing & Cost Configuration
+// Pricing & Cost Configuration (Legacy - kept for fallback)
 export const RATE_PER_METER = 0.0635;
 export const BAD_WEATHER_SURCHARGE = 30;
 export const OFF_HOUR_SURCHARGE = 50;
@@ -31,19 +32,101 @@ export interface FeeCalculation {
   totalCosts: number;
   profit: number;
   distanceKm: string;
+  
+  // New tiered pricing fields
+  distanceTier?: string;
+  baseTierFee?: number;
+  excessDistanceMeters?: number;
+  excessDistanceFee?: number;
+  isEssentialMode?: boolean;
+  essentialModeDiscount?: number;
 }
 
-export const calculateDeliveryFee = (
-  params: Partial<DeliveryForm>, 
+// Fetch pricing configuration from database
+export const getPricingConfig = async () => {
+  const { data, error } = await supabase
+    .from('pricing_config')
+    .select('*')
+    .eq('is_active', true)
+    .eq('config_name', 'default')
+    .single();
+
+  if (error) {
+    console.warn('Failed to fetch pricing config, using defaults:', error);
+    return {
+      tier_1_max_meters: 3000,
+      tier_1_rate: 0.0400,
+      tier_2_max_meters: 7000,
+      tier_2_rate: 0.0500,
+      tier_3_rate: 0.0635,
+      essential_discount_percent: 20.0
+    };
+  }
+
+  return data;
+};
+
+// Calculate tiered distance fee
+export const calculateTieredDistanceFee = (
+  distanceMeters: number,
+  pricingConfig: any,
+  isEssentialMode: boolean = false
+) => {
+  let baseTierFee = 0;
+  let excessDistanceMeters = 0;
+  let excessDistanceFee = 0;
+  let distanceTier = '';
+
+  if (distanceMeters <= pricingConfig.tier_1_max_meters) {
+    // Tier 1: 0-3km
+    baseTierFee = distanceMeters * pricingConfig.tier_1_rate;
+    distanceTier = 'tier_1';
+  } else if (distanceMeters <= pricingConfig.tier_2_max_meters) {
+    // Tier 2: 3-7km
+    baseTierFee = pricingConfig.tier_1_max_meters * pricingConfig.tier_1_rate;
+    excessDistanceMeters = distanceMeters - pricingConfig.tier_1_max_meters;
+    excessDistanceFee = excessDistanceMeters * pricingConfig.tier_2_rate;
+    distanceTier = 'tier_2';
+  } else {
+    // Tier 3: 7km+
+    baseTierFee = pricingConfig.tier_1_max_meters * pricingConfig.tier_1_rate;
+    const tier2Distance = pricingConfig.tier_2_max_meters - pricingConfig.tier_1_max_meters;
+    baseTierFee += tier2Distance * pricingConfig.tier_2_rate;
+    excessDistanceMeters = distanceMeters - pricingConfig.tier_2_max_meters;
+    excessDistanceFee = excessDistanceMeters * pricingConfig.tier_3_rate;
+    distanceTier = 'tier_3';
+  }
+
+  const totalDistanceFee = baseTierFee + excessDistanceFee;
+  
+  // Apply essential mode discount
+  let essentialModeDiscount = 0;
+  if (isEssentialMode) {
+    essentialModeDiscount = totalDistanceFee * (pricingConfig.essential_discount_percent / 100);
+  }
+
+  return {
+    distanceFee: totalDistanceFee - essentialModeDiscount,
+    distanceTier,
+    baseTierFee,
+    excessDistanceMeters,
+    excessDistanceFee,
+    essentialModeDiscount
+  };
+};
+
+export const calculateDeliveryFee = async (
+  params: Partial<DeliveryForm> & { isEssentialMode?: boolean }, 
   customerOrderCount: number = 0
-): FeeCalculation => {
+): Promise<FeeCalculation> => {
   const {
     distanceMeters = '0',
     weightKg = '0',
     isBadWeather = false,
     isOffHour = false,
     isFastDelivery = false,
-    manualDiscountPercent = '0'
+    manualDiscountPercent = '0',
+    isEssentialMode = false
   } = params;
 
   // Validate and sanitize inputs
@@ -51,7 +134,12 @@ export const calculateDeliveryFee = (
   const validWeight = Math.max(0, parseFloat(weightKg) || 0);
   const validDiscount = Math.min(100, Math.max(0, parseFloat(manualDiscountPercent) || 0));
 
-  const distanceFee = validDistance * RATE_PER_METER;
+  // Get pricing configuration
+  const pricingConfig = await getPricingConfig();
+
+  // Calculate tiered distance fee
+  const tieredResult = calculateTieredDistanceFee(validDistance, pricingConfig, isEssentialMode);
+
   const weatherSurcharge = isBadWeather ? BAD_WEATHER_SURCHARGE : 0;
   const offHourSurcharge = isOffHour ? OFF_HOUR_SURCHARGE : 0;
   const expressBonus = isFastDelivery ? FAST_DELIVERY_BONUS : 0;
@@ -62,7 +150,7 @@ export const calculateDeliveryFee = (
   }
 
   const totalSurcharges = weatherSurcharge + offHourSurcharge + weightSurcharge;
-  const subtotal = distanceFee + totalSurcharges + expressBonus;
+  const subtotal = tieredResult.distanceFee + totalSurcharges + expressBonus;
   
   // Calculate manual discount
   const manualDiscountAmount = subtotal * (validDiscount / 100);
@@ -87,7 +175,7 @@ export const calculateDeliveryFee = (
   const profit = finalFee - totalCosts;
 
   return {
-    distanceFee,
+    distanceFee: tieredResult.distanceFee,
     weatherSurcharge,
     offHourSurcharge,
     expressBonus,
@@ -101,6 +189,14 @@ export const calculateDeliveryFee = (
     totalCosts,
     profit,
     distanceKm: (validDistance / 1000).toFixed(2),
+    
+    // New tiered pricing fields
+    distanceTier: tieredResult.distanceTier,
+    baseTierFee: tieredResult.baseTierFee,
+    excessDistanceMeters: tieredResult.excessDistanceMeters,
+    excessDistanceFee: tieredResult.excessDistanceFee,
+    isEssentialMode,
+    essentialModeDiscount: tieredResult.essentialModeDiscount
   };
 };
 

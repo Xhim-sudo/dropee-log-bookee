@@ -54,6 +54,14 @@ export interface Delivery {
   autoDistanceMeters?: number;
   distanceSource?: string;
   performanceScore?: number;
+  
+  // New tiered pricing fields
+  distanceTier?: string;
+  baseTierFee?: number;
+  excessDistanceMeters?: number;
+  excessDistanceFee?: number;
+  isEssentialMode?: boolean;
+  essentialModeDiscount?: number;
 }
 
 export interface MonthlyData {
@@ -83,6 +91,9 @@ export interface DeliveryForm {
   
   // Enhanced vendor and tracking fields
   vendorId: string;
+  
+  // New essential mode field
+  isEssentialMode?: boolean;
   
   // Enhanced tracking data (added during processing)
   startTime?: string;

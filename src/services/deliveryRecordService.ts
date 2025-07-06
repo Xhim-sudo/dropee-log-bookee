@@ -39,6 +39,14 @@ export interface DeliveryRecord {
   durationMinutes?: number;
   autoDistanceMeters?: number;
   distanceSource?: string;
+  
+  // New tiered pricing fields
+  distanceTier?: string;
+  baseTierFee?: number;
+  excessDistanceMeters?: number;
+  excessDistanceFee?: number;
+  isEssentialMode?: boolean;
+  essentialModeDiscount?: number;
 }
 
 export const insertDeliveryRecord = async (
@@ -86,6 +94,14 @@ export const insertDeliveryRecord = async (
       duration_minutes: deliveryRecord.durationMinutes || null,
       auto_distance_meters: deliveryRecord.autoDistanceMeters || null,
       distance_source: deliveryRecord.distanceSource || 'manual',
+      
+      // New tiered pricing data
+      distance_tier: deliveryRecord.distanceTier || null,
+      base_tier_fee: deliveryRecord.baseTierFee || null,
+      excess_distance_meters: deliveryRecord.excessDistanceMeters || null,
+      excess_distance_fee: deliveryRecord.excessDistanceFee || null,
+      is_essential_mode: deliveryRecord.isEssentialMode || false,
+      essential_mode_discount: deliveryRecord.essentialModeDiscount || null,
     });
 
   if (deliveryError) {
@@ -93,5 +109,5 @@ export const insertDeliveryRecord = async (
     throw deliveryError;
   }
 
-  console.log('Enhanced delivery inserted successfully');
+  console.log('Enhanced delivery with tiered pricing inserted successfully');
 };

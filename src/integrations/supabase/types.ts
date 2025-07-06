@@ -50,6 +50,7 @@ export type Database = {
           auto_discount_amount: number | null
           auto_discount_type: string | null
           auto_distance_meters: number | null
+          base_tier_fee: number | null
           created_at: string
           customer_address: string
           customer_id: string | null
@@ -62,13 +63,18 @@ export type Database = {
           distance_fee: number
           distance_meters: number
           distance_source: string | null
+          distance_tier: string | null
           duration_minutes: number | null
           end_time: string | null
+          essential_mode_discount: number | null
+          excess_distance_fee: number | null
+          excess_distance_meters: number | null
           express_bonus: number | null
           final_fee: number
           id: string
           is_bad_weather: boolean | null
           is_defective: boolean | null
+          is_essential_mode: boolean | null
           is_fast_delivery: boolean | null
           is_off_hour: boolean | null
           manual_discount_percent: number | null
@@ -93,6 +99,7 @@ export type Database = {
           auto_discount_amount?: number | null
           auto_discount_type?: string | null
           auto_distance_meters?: number | null
+          base_tier_fee?: number | null
           created_at?: string
           customer_address: string
           customer_id?: string | null
@@ -105,13 +112,18 @@ export type Database = {
           distance_fee: number
           distance_meters: number
           distance_source?: string | null
+          distance_tier?: string | null
           duration_minutes?: number | null
           end_time?: string | null
+          essential_mode_discount?: number | null
+          excess_distance_fee?: number | null
+          excess_distance_meters?: number | null
           express_bonus?: number | null
           final_fee: number
           id?: string
           is_bad_weather?: boolean | null
           is_defective?: boolean | null
+          is_essential_mode?: boolean | null
           is_fast_delivery?: boolean | null
           is_off_hour?: boolean | null
           manual_discount_percent?: number | null
@@ -136,6 +148,7 @@ export type Database = {
           auto_discount_amount?: number | null
           auto_discount_type?: string | null
           auto_distance_meters?: number | null
+          base_tier_fee?: number | null
           created_at?: string
           customer_address?: string
           customer_id?: string | null
@@ -148,13 +161,18 @@ export type Database = {
           distance_fee?: number
           distance_meters?: number
           distance_source?: string | null
+          distance_tier?: string | null
           duration_minutes?: number | null
           end_time?: string | null
+          essential_mode_discount?: number | null
+          excess_distance_fee?: number | null
+          excess_distance_meters?: number | null
           express_bonus?: number | null
           final_fee?: number
           id?: string
           is_bad_weather?: boolean | null
           is_defective?: boolean | null
+          is_essential_mode?: boolean | null
           is_fast_delivery?: boolean | null
           is_off_hour?: boolean | null
           manual_discount_percent?: number | null
@@ -263,6 +281,48 @@ export type Database = {
           total_profit?: number
           total_revenue?: number
           total_surcharges?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pricing_config: {
+        Row: {
+          config_name: string
+          created_at: string
+          essential_discount_percent: number
+          id: string
+          is_active: boolean | null
+          tier_1_max_meters: number
+          tier_1_rate: number
+          tier_2_max_meters: number
+          tier_2_rate: number
+          tier_3_rate: number
+          updated_at: string
+        }
+        Insert: {
+          config_name: string
+          created_at?: string
+          essential_discount_percent?: number
+          id?: string
+          is_active?: boolean | null
+          tier_1_max_meters?: number
+          tier_1_rate?: number
+          tier_2_max_meters?: number
+          tier_2_rate?: number
+          tier_3_rate?: number
+          updated_at?: string
+        }
+        Update: {
+          config_name?: string
+          created_at?: string
+          essential_discount_percent?: number
+          id?: string
+          is_active?: boolean | null
+          tier_1_max_meters?: number
+          tier_1_rate?: number
+          tier_2_max_meters?: number
+          tier_2_rate?: number
+          tier_3_rate?: number
           updated_at?: string
         }
         Relationships: []

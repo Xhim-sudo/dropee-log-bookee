@@ -10,7 +10,7 @@ export const processDeliveryRecord = async (
   deliveryRecord: DeliveryRecord,
   customers: CustomerMap
 ): Promise<DeliveryRecord> => {
-  console.log('Processing enhanced delivery record:', deliveryRecord);
+  console.log('Processing enhanced delivery record with tiered pricing:', deliveryRecord);
   
   try {
     // First, upsert customer
@@ -33,7 +33,7 @@ export const processDeliveryRecord = async (
   }
 };
 
-export const createDeliveryRecord = (
+export const createDeliveryRecord = async (
   deliveryForm: DeliveryForm & {
     startTime?: string;
     endTime?: string;
@@ -47,8 +47,8 @@ export const createDeliveryRecord = (
   },
   currentMonth: string,
   customers: CustomerMap
-): DeliveryRecord => {
-  console.log('Creating enhanced delivery record from form:', deliveryForm);
+): Promise<DeliveryRecord> => {
+  console.log('Creating enhanced delivery record with tiered pricing from form:', deliveryForm);
   
   const validationError = validateDeliveryForm(deliveryForm);
   if (validationError) {
@@ -61,8 +61,9 @@ export const createDeliveryRecord = (
 
   console.log('Customer info:', { customerId, currentCustomerOrderCount });
 
-  const feeCalculation = calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
-  console.log('Fee calculation result:', feeCalculation);
+  // Calculate fees using new tiered pricing system
+  const feeCalculation = await calculateDeliveryFee(deliveryForm, currentCustomerOrderCount);
+  console.log('Tiered fee calculation result:', feeCalculation);
 
   const deliveryRecord: DeliveryRecord = {
     customerName: deliveryForm.customerName,
@@ -89,9 +90,17 @@ export const createDeliveryRecord = (
     endTime: deliveryForm.endTime,
     durationMinutes: deliveryForm.durationMinutes,
     autoDistanceMeters: deliveryForm.autoDistanceMeters,
-    distanceSource: deliveryForm.distanceSource || 'manual'
+    distanceSource: deliveryForm.distanceSource || 'manual',
+    
+    // New tiered pricing fields
+    distanceTier: feeCalculation.distanceTier,
+    baseTierFee: feeCalculation.baseTierFee,
+    excessDistanceMeters: feeCalculation.excessDistanceMeters,
+    excessDistanceFee: feeCalculation.excessDistanceFee,
+    isEssentialMode: feeCalculation.isEssentialMode,
+    essentialModeDiscount: feeCalculation.essentialModeDiscount
   };
   
-  console.log('Final enhanced delivery record created:', deliveryRecord);
+  console.log('Final enhanced delivery record with tiered pricing created:', deliveryRecord);
   return deliveryRecord;
 };

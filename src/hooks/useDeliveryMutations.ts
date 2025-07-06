@@ -34,7 +34,7 @@ export const useDeliveryMutations = (
       }
     },
     onSuccess: (deliveryRecord) => {
-      console.log('Delivery processed successfully:', deliveryRecord);
+      console.log('Delivery processed successfully with tiered pricing:', deliveryRecord);
       
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       queryClient.invalidateQueries({ queryKey: ['deliveries'] });
@@ -46,14 +46,22 @@ export const useDeliveryMutations = (
         customerName: '', customerPhone: '', customerAddress: '',
         orderDescription: '', distanceMeters: '', orderValue: '',
         weightKg: '', manualDiscountPercent: '', isBadWeather: false,
-        isOffHour: false, isFastDelivery: false, vendorId: ''
+        isOffHour: false, isFastDelivery: false, vendorId: '', isEssentialMode: false
       });
 
       const discountMessage = deliveryRecord.autoDiscountAmount > 0 
         ? ` (includes ${deliveryRecord.autoDiscountType}: ₹${deliveryRecord.autoDiscountAmount.toFixed(2)} discount)`
         : '';
       
-      alert(`Delivery processed! Final Fee: ₹${deliveryRecord.finalFee.toFixed(2)}${discountMessage}`);
+      const essentialMessage = deliveryRecord.isEssentialMode && deliveryRecord.essentialModeDiscount > 0
+        ? ` + Essential Mode: ₹${deliveryRecord.essentialModeDiscount.toFixed(2)} discount`
+        : '';
+        
+      const tierMessage = deliveryRecord.distanceTier 
+        ? ` | ${deliveryRecord.distanceTier.replace('_', ' ').toUpperCase()} pricing`
+        : '';
+      
+      alert(`Delivery processed! Final Fee: ₹${deliveryRecord.finalFee.toFixed(2)}${discountMessage}${essentialMessage}${tierMessage}`);
     },
     onError: (error) => {
       console.error('Delivery processing failed:', error);
@@ -91,11 +99,11 @@ export const useDeliveryMutations = (
     }
   });
 
-  const processDelivery = (deliveryForm: DeliveryFormType) => {
-    console.log('Processing delivery form:', deliveryForm);
+  const processDelivery = async (deliveryForm: DeliveryFormType) => {
+    console.log('Processing delivery form with tiered pricing:', deliveryForm);
     
     try {
-      const deliveryRecord = createDeliveryRecord(deliveryForm, currentMonth, customers);
+      const deliveryRecord = await createDeliveryRecord(deliveryForm, currentMonth, customers);
       processDeliveryMutation.mutate(deliveryRecord);
     } catch (error) {
       console.error('Error creating delivery record:', error);
